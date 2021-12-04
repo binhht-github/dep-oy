@@ -1,12 +1,12 @@
-package com.example.demo.api;
+package com.example.demo;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class api {
-	@GetMapping("/api/test")
-	public String te() {
-		return "Test deploy heroku";
+public class t {
+	@GetMapping("/api/t")
+	public String g () {
+		return "test appi ";
 	}
 }
