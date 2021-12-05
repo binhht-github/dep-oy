@@ -2,6 +2,7 @@ package com.spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.dto.model.AccountsDTO;
+import com.spring.enumeration.AuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +46,12 @@ public class Accounts {
     @Column(name = "delete_at")
     private Boolean deleteAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name ="provider")
+    private AuthProvider provider;
+
+    @Column(name = "provider_id")
+    private String providerId;
 //one to many
 
     @JsonIgnore

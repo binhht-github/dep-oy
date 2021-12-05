@@ -11,12 +11,12 @@ public class CorsConfig  implements WebMvcConfigurer {
         @Value("${allowed.origin}")
         private String allowedOrigin;
 
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/**")
-                    .allowedOrigins(allowedOrigin)
-                    .allowedMethods("*")
-                    .allowedHeaders("*")
-                    .allowCredentials(true);
-        }
+//        @Override
+//        public void addCorsMappings(CorsRegistry registry) {
+//            registry.addMapping("/**")
+//                    .allowedOrigins(allowedOrigin)
+//                    .allowedMethods("*")
+//                    .allowedHeaders("*")
+//                    .allowCredentials(true);
+//        }
 }
