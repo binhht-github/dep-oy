@@ -32,4 +32,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     
     @Query(value = "select * from reportDoanhThu", nativeQuery = true)
     List<Object[]> reportDoanhThu();
+    
+    @Query(value = "select * from reportThangHoadon", nativeQuery = true)
+    List<Object[]> reportHoaDon();
 }

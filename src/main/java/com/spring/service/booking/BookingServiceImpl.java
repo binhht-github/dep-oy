@@ -85,13 +85,46 @@ public class BookingServiceImpl implements BookingService {
 
 		Optional<Booking> optional = bookingRepository.findById(bookingDTO.getId());
 		if (optional.isPresent()) {
-			Booking entity = bookingDTO.convertDTOToEntity();
-			bookingRepository.save(entity);
-			bookingDTO = entity.convertEntityToDTO();
-
-			//gửi mail khi có kết quả khám
 			String email = bookingRepository.findById(bookingDTO.getId()).get().
 					getCustomerProfile().getAccounts().getEmail();
+
+			Booking oldEntity=optional.get();
+			String dayOfWeekOld=oldEntity.getScheduleTime().getDayOfWeek()
+					.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+			String startOld=oldEntity.getScheduleTime().getStart().
+					format(DateTimeFormatter.ofPattern("HH:mm"));
+			String endOld=oldEntity.getScheduleTime().getEnd()
+					.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+			Boolean check=false;
+			if(bookingDTO.getScheduleTime().getId()!=oldEntity.getScheduleTime().getId()){
+				check=true;
+//				System.out.printf("okkkkkkk change");
+			}
+
+			Booking entity = bookingDTO.convertDTOToEntity();
+			bookingDTO = bookingRepository.save(entity).convertEntityToDTO();
+//			System.out.println(bookingDTO.getScheduleTime().getDayOfWeek()+"aaaaaaaaaa");
+
+			// gửi mail khi thay đổi lịch khám
+			if(check==true){
+				mailServices.push(email, "Thay đổi lịch khám", "<html>" + "<body>"
+						+ "Lịch khám của bạn đã thay đồi từ: <br/>"
+						+"Ngày: "+dayOfWeekOld+" "
+						+"khung giờ: "+startOld
+						+"-"+endOld+"<br/>"
+						+" Chuyển sang: <br/>"
+						+"<b>Ngày: "+bookingDTO.getScheduleTime().getDayOfWeek().
+						format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))+" "+
+						"khung giờ: "+bookingDTO.getScheduleTime().getStart().
+						format(DateTimeFormatter.ofPattern("HH:mm"))+
+						"-"+bookingDTO.getScheduleTime().getEnd().
+						format(DateTimeFormatter.ofPattern("HH:mm"))+
+						"</body>" + "</html>");
+//				check=false;
+			}
+
+			//gửi mail khi có kết quả khám
 			if(bookingDTO.getKetqua()!=null && ! bookingDTO.getKetqua().equals("")){
 				mailServices.push(email, "Kết quả khám", "<html>" + "<body>"
 						+ "Kết quả khám của bạn là: <br/>" +
@@ -99,6 +132,8 @@ public class BookingServiceImpl implements BookingService {
 						+"Nha sĩ kết luận: "+bookingDTO.getDentistProfile().getFullName()+
 						"</body>" + "</html>");
 			}
+
+
 		}
 		return bookingDTO;
 	}
