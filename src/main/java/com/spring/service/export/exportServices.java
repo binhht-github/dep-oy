@@ -57,6 +57,7 @@ public class exportServices {
 		con.setDoOutput(true);
 		con.setRequestMethod("GET");
 		List<NameValuePair> params = new ArrayList<>();
+		System.out.println(list1.size());
 		params.add(new BasicNameValuePair("string", (list1.size() <=0 ? "Hóa Đơn" : list1.get(0)[0])+""));
 
 		OutputStream os = con.getOutputStream();
@@ -150,7 +151,7 @@ public class exportServices {
 		try {
 			InputStreamResource resource = new InputStreamResource(new FileInputStream(f));
 			HttpHeaders headers = new HttpHeaders();
-			headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", f.getName()));
+			headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", con.getHeaderField("string")+".docx"));
 			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 			headers.add("Pragma", "no-cache");
 			headers.add("Expires", "0");
@@ -165,6 +166,7 @@ public class exportServices {
 		} finally {
 			out.close();
 			document.close();
+			con.disconnect();
 		}
 	}
 	
