@@ -1,6 +1,5 @@
 package com.spring.dto.model;
 
-import com.spring.enumeration.AuthProvider;
 import com.spring.model.Accounts;
 import com.spring.utils.BcryptUtil;
 import lombok.AllArgsConstructor;
@@ -9,9 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
 import java.util.Date;
 
@@ -39,11 +35,6 @@ public class AccountsDTO {
     String rolesId;
 
     private Boolean deleteAt;
-
-    @Enumerated(EnumType.STRING)
-    private AuthProvider provider;
-
-    private String providerId;
 
     public AccountsDTO(Long id, String rolesId) {
         this.id = id;

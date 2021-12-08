@@ -14,6 +14,7 @@ import com.spring.dto.model.ReportBookingDTO;
 import com.spring.dto.model.ReportCustommer;
 import com.spring.dto.model.ReportDentist;
 import com.spring.dto.model.ReportThangDTO;
+import com.spring.dto.model.ReportThangHoaDon;
 import com.spring.dto.model.ReportThongKeDTO;
 import com.spring.dto.response.Response;
 import com.spring.service.reportBooking.ReportBooking;
@@ -21,6 +22,7 @@ import com.spring.service.reportCustomer.ReportCustomerService;
 import com.spring.service.reportDentist.ReportDentistService;
 import com.spring.service.reportServices.ReportServices;
 import com.spring.service.reportThang.reportThang;
+import com.spring.service.reportThangHoaDon.reportHoaDon;
 import com.spring.service.reportThongke.ReportThongKe;
 
 @RestController
@@ -38,6 +40,8 @@ public class Report {
 	ReportThongKe reportThongKe;
 	@Autowired
 	reportThang reportThangservices;
+	@Autowired
+	reportHoaDon reportHoaDon;
 	
 	// trả về danh sách bác sĩ và số người đặt bắc sĩ
 	@GetMapping("/dentist")
@@ -79,6 +83,14 @@ public class Report {
 	public ResponseEntity<Response<List<ReportThangDTO>>> reportDoanhThu(@PathVariable("nam") int nam) {
 		Response<List<ReportThangDTO>> response = new Response<>();
 		response.setData(reportThangservices.report(nam));
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/hoadon")
+	public ResponseEntity<Response<List<ReportThangHoaDon>>> reportHoaDon() {
+		Response<List<ReportThangHoaDon>> response = new Response<>();
+		response.setData(reportHoaDon.report());
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }
