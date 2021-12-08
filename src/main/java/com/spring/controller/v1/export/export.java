@@ -1,9 +1,8 @@
 package com.spring.controller.v1.export;
 
-
-
 import java.io.IOException;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +17,10 @@ import com.spring.service.export.exportServices;
 public class export {
 	@Autowired
 	exportServices ex;
-	
+
 //	@RequestMapping(value = "/download", method = RequestMethod.GET)
 	@GetMapping("/download/{id}")
-	public ResponseEntity<Object> downloadFile(@PathVariable("id") Long id) throws IOException {
+	public ResponseEntity<Object> downloadFile(@PathVariable("id") Long id) throws IOException, InvalidFormatException {
 		return ex.test(id);
 	}
 }
