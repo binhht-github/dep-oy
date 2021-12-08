@@ -88,17 +88,17 @@ public class exportServices {
 																												// pixels
 //		logo.setAlignment(ParagraphAlignment.LEFT);
 		
-		try {
-			CTDrawing drawing = logoRun.getCTR().getDrawingArray(0);
-			  CTGraphicalObject graphicalobject = drawing.getInlineArray(0).getGraphic();
-			  CTAnchor anchor = getAnchorWithGraphic(graphicalobject, "samplePict.jpeg", 
-			                                         Units.toEMU(120), Units.toEMU(100), 
-			                                         Units.toEMU(20), Units.toEMU(10));
-			  drawing.setAnchorArray(new CTAnchor[]{anchor});
-			  drawing.removeInline(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			CTDrawing drawing = logoRun.getCTR().getDrawingArray(0);
+//			  CTGraphicalObject graphicalobject = drawing.getInlineArray(0).getGraphic();
+//			  CTAnchor anchor = getAnchorWithGraphic(graphicalobject, "samplePict.jpeg", 
+//			                                         Units.toEMU(120), Units.toEMU(100), 
+//			                                         Units.toEMU(20), Units.toEMU(10));
+//			  drawing.setAnchorArray(new CTAnchor[]{anchor});
+//			  drawing.removeInline(0);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		XWPFParagraph tenbv = document.createParagraph();
 		XWPFRun ltenbvRun = tenbv.createRun();
