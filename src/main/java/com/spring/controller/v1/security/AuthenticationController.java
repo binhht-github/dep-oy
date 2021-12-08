@@ -5,13 +5,19 @@ import com.spring.dto.model.security.JwtAccountDTO;
 import com.spring.dto.model.security.TokenDTO;
 import com.spring.dto.response.Response;
 import com.spring.exception.NotParsableContentException;
+import com.spring.exception.ResourceNotFoundException;
 import com.spring.model.Accounts;
 import com.spring.model.security.JwtUserDetailsImpl;
+import com.spring.repository.AccountRepository;
+import com.spring.security.oauth2.CurrentUser;
+import com.spring.security.oauth2.TokenProvider;
+import com.spring.security.oauth2.UserPrincipal;
 import com.spring.service.account.AccountService;
 import com.spring.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,17 +43,25 @@ public class AuthenticationController {
 
     private AccountService accountService;
 
+    private AccountRepository accountRepository;
+
+    private TokenProvider tokenProvider;
+
     @Autowired
     public AuthenticationController(
             AuthenticationManager authenticationManager,
             JwtTokenUtil jwtTokenUtil,
             UserDetailsService userDetailsService,
-            AccountService accountService
+            AccountService accountService,
+            AccountRepository accountRepository,
+            TokenProvider tokenProvider
     ) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
         this.accountService = accountService;
+        this.accountRepository = accountRepository;
+        this.tokenProvider = tokenProvider;
     }
 
     @PostMapping
@@ -80,9 +94,9 @@ public class AuthenticationController {
                 (new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        JwtUserDetailsImpl userDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+//        JwtUserDetailsImpl userDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
 
-        String token = jwtTokenUtil.getToken(userDetails);
+        String token =  this.tokenProvider.createTokenUser(authentication);
         response.setData(new TokenDTO(token));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -100,4 +114,12 @@ public class AuthenticationController {
         account.ifPresent(accounts -> response.setData(new AccountsDTO(accounts.getId(), accounts.getRoles().getName())));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/user/me")
+//    @PreAuthorize("hasRole('CUSTOMER')")
+    public Accounts getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+        return accountRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+    }
+
 }
