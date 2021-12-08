@@ -1,13 +1,22 @@
 package com.spring.service.export;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -33,13 +42,33 @@ public class exportServices {
 	BookingRepository bookingRepository;
 
 	public ResponseEntity<Object> test(Long idBooking) throws IOException {
-		// Create new Paragraph
 		List<Object[]> list1 = new ArrayList<>();
 		List<Object[]> list2 = new ArrayList<>();
-
+		
 		list1 = bookingRepository.exportHoaDon(idBooking);
 		list2 = bookingRepository.exportHoaDon2(idBooking);
+		
+		URL url = new URL("https://character-text.herokuapp.com/convert/string-character");
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
+		con.setReadTimeout(10000);
+		con.setConnectTimeout(15000);
+		con.setDoInput(true);
+		con.setDoOutput(true);
+		con.setRequestMethod("GET");
+		List<NameValuePair> params = new ArrayList<>();
+		params.add(new BasicNameValuePair("string", (list1.size() <=0 ? "Hóa Đơn" : list1.get(0)[0])+""));
+
+		OutputStream os = con.getOutputStream();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+		writer.write(getQuery(params));
+		writer.flush();
+		writer.close();
+		os.close();
+
+		con.connect();
+		
+		// Create new document
 		XWPFDocument document = new XWPFDocument();
 		// Create new Paragraph
 		XWPFParagraph tieude = document.createParagraph();
@@ -115,7 +144,7 @@ public class exportServices {
 		run.setText((list1.size() <=0 ? "" : list1.get(0)[4]+""));
 
 		// Write the Document in file system
-		File f = new File((list1.size() <=0 ? "bao-cao" : list1.get(0)[0])+".docx");
+		File f = new File("Hoa Don.docx");
 		FileOutputStream out = new FileOutputStream(f);
 		document.write(out);
 		try {
@@ -137,5 +166,23 @@ public class exportServices {
 			out.close();
 			document.close();
 		}
+	}
+	
+	private static String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
+		StringBuilder result = new StringBuilder();
+		boolean first = true;
+
+		for (NameValuePair pair : params) {
+			if (first)
+				first = false;
+			else
+				result.append("&");
+
+			result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
+			result.append("=");
+			result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+		}
+
+		return result.toString();
 	}
 }

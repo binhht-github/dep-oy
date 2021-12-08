@@ -142,7 +142,7 @@ public class ScheduleTimeController {
     //read all schedule_time with dentist_id
     @GetMapping("/dentist")
     public ResponseEntity<Response<List<ScheduleTimeDTO>>> getAllTimeByDentistId(
-            @RequestParam Long dentistProfileId
+            @RequestParam("id") Long dentistProfileId
     ) {
         Response<List<ScheduleTimeDTO>> response = new Response<>();
         response.setData(this.scheduleTimeService.readAllTimeByDentistId(dentistProfileId));
