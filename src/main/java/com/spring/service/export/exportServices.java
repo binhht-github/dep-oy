@@ -12,8 +12,10 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -45,15 +47,17 @@ import com.spring.repository.BookingRepository;
 public class exportServices {
 	@Autowired
 	BookingRepository bookingRepository;
+	@Autowired
+	convertString cv;
 
 	public ResponseEntity<Object> test(Long idBooking) throws IOException, InvalidFormatException {
 		List<Object[]> list1 = new ArrayList<>();
 		List<Object[]> list2 = new ArrayList<>();
 
+        NumberFormat format =  NumberFormat.getInstance(new Locale("vi"));
+
 		list1 = bookingRepository.exportHoaDon(idBooking);
 		list2 = bookingRepository.exportHoaDon2(idBooking);
-
-		System.out.println(list1.size() + list2.size());
 
 		URL url = new URL("https://character-text.herokuapp.com/convert/string-character");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -64,7 +68,6 @@ public class exportServices {
 		con.setDoOutput(true);
 		con.setRequestMethod("GET");
 		List<NameValuePair> params = new ArrayList<>();
-		System.out.println(list1.size());
 		params.add(new BasicNameValuePair("string", (list1.size() <= 0 ? "Hóa Đơn" : list1.get(0)[0]) + ""));
 
 		OutputStream os = con.getOutputStream();
@@ -105,7 +108,7 @@ public class exportServices {
 		ltenbvRun.setColor("0876C3");
 		ltenbvRun.addBreak();
 		XWPFRun daichi2 = tenbv.createRun();
-		daichi2.setText("Địa chỉ số 1 Trịnh Văn Bô, Nam Từ Niêm, Hà Nội");
+		daichi2.setText("Địa chỉ số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội");
 		daichi2.setColor("0876C3");
 		daichi2.addBreak();
 		daichi2.addBreak();
@@ -132,7 +135,7 @@ public class exportServices {
 		run.setText("Địa chỉ:  " + (list1.size() <= 0 ? "" : list1.get(0)[2] + ""));
 		run.addBreak();
 		run.addBreak();
-		run.setText("Dịch vụ đã khám");
+		run.setText("Dịch vụ đã khám:");
 
 		XWPFTable tb = document.createTable();
 		tb.setCellMargins(200, 200, 0, 0);
@@ -140,7 +143,7 @@ public class exportServices {
 //		tb.setInsideVBorder(XWPFTable.XWPFBorderType.SINGLE, 4, 0, "0876C3");
 		CTTblWidth width = tb.getCTTbl().addNewTblPr().addNewTblW();
 		width.setType(STTblWidth.DXA);
-		width.setW(BigInteger.valueOf(9072));
+		width.setW(BigInteger.valueOf(9080));
 		XWPFTableRow row = tb.getRow(0);
 //		row.getCell(0).setColor(null)
 //		row.getCell(0).setColor("0876C3");
@@ -153,6 +156,7 @@ public class exportServices {
 		cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
 		XWPFTableCell cell1 = row.createCell();
 		cell1.setText("Giá");
+		
 
 		if (list2.size() > 0 && list1.size() > 0) {
 			for (Object[] obj : list2) {
@@ -161,7 +165,7 @@ public class exportServices {
 				c.setText(obj[0] + "");
 				c.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
 				XWPFTableCell c2 = r.getCell(1);
-				c2.setText(obj[1] + "");
+				c2.setText(format.format(obj[1]) + "");
 				c2.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
 			}
 		}
@@ -169,8 +173,10 @@ public class exportServices {
 		XWPFParagraph paragraph4 = document.createParagraph();
 		run = paragraph4.createRun();
 //		run.setColor("0876C3");
-		run.setText("Tổng tiền: " + (list1.size() <= 0 ? "" : list1.get(0)[3] + " VND"));
-
+		run.setText((list1.size() <= 0 ? "" :list1.get(0)[5] == null ? "" :"Có áp dụng mã giảm giá "+list1.get(0)[6]+ (Double.parseDouble(list1.get(0)[6]+"")< 100 ? "%" : "VND")+": "+ list1.get(0)[5]));
+		run.addBreak();
+		run.setText("Tổng tiền: " + (list1.size() <= 0 ? "" :format.format(list1.get(0)[3])  + " VND ") + " (viết bằng chữ): " + (list1.size() <= 0 ? "" :convertString.ChuyenSangChu((int) Double.parseDouble(list1.get(0)[3].toString())+"")));
+		
 		XWPFParagraph ngaythangnam = document.createParagraph();
 		ngaythangnam.setIndentationFirstLine(5000);
 		run = ngaythangnam.createRun();

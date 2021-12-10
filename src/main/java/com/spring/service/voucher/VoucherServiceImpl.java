@@ -81,7 +81,7 @@ public class VoucherServiceImpl implements VoucherService {
 					LocalDateTime.now().plusMonths(2), new Date(), false);
 			if (save(v) != null) {
 				mailServices.push(cs.getAccounts().getEmail(), "Chi ân khách hàng" + v.getContent(),
-						"<html><body>Xin cảm ơn quý khách đã sử dụng dịch vụ của phòng khám, phòng khám xin gửi tới quý khách 1 voucher giảm giá "+sale+"%"
+						"<html><body>Xin cảm ơn quý khách đã sử dụng dịch vụ của phòng khám, phòng khám xin gửi tới quý khách 1 voucher giảm giá "+sale + (sale <= 100 ? "%" : "VND")
 								+ " <br/> Mã Voucher: " + maVoucher + " </body></html>");
 			}
 			this.sentVoucher(Integer.parseInt(cs.getAccounts().getId() + ""), cs.getAccounts().getEmail());

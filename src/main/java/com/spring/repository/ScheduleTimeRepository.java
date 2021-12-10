@@ -12,18 +12,20 @@ import java.util.Optional;
 
 @Repository
 public interface ScheduleTimeRepository extends JpaRepository<ScheduleTime, Long> {
-  //read all by deleteAt=TRUE
-    public List<ScheduleTime> findByDeleteAtIsTrue();
+	// read all by deleteAt=TRUE
+	public List<ScheduleTime> findByDeleteAtIsTrue();
 
-    //read all by deleteAT=FALSE
-    public List<ScheduleTime> findByDeleteAtIsFalse();
+	// read all by deleteAT=FALSE
+	public List<ScheduleTime> findByDeleteAtIsFalse();
 
-    @Query("SELECT e FROM ScheduleTime e WHERE e.dentistProfile.id=:dentistProfileId AND " +
-            "e.deleteAt=FALSE AND e.dayOfWeek > CURRENT_DATE GROUP BY e.dayOfWeek")
-    public List<ScheduleTime> findAllTimeByDentistId(@Param("dentistProfileId") Long dentistProfileId);
+	@Query("SELECT e FROM ScheduleTime e WHERE e.dentistProfile.id=:dentistProfileId AND "
+			+ "e.deleteAt=FALSE AND e.dayOfWeek > CURRENT_DATE GROUP BY e.dayOfWeek")
+	public List<ScheduleTime> findAllTimeByDentistId(@Param("dentistProfileId") Long dentistProfileId);
 
-    @Query("SELECT e FROM ScheduleTime e WHERE e.dayOfWeek=:dayOfWeek  " +
-            "AND e.dentistProfile.id=:dentistId AND e.deleteAt=FALSE")
-        public List<ScheduleTime> findHourByDayAndDentistId
-            (@Param("dayOfWeek") LocalDate dayOfWeek, @Param("dentistId") Long dentistId);
+	@Query("SELECT e.id,e.dayOfWeek,e.start,e.end,e.dentistProfile,e.deleteAt FROM ScheduleTime e WHERE e.dayOfWeek=:dayOfWeek  "
+			+ "AND e.dentistProfile.id=:dentistId AND e.deleteAt=FALSE  group by e.dayOfWeek")
+	public List<ScheduleTime> findHourByDayAndDentistId(@Param("dayOfWeek") LocalDate dayOfWeek,
+			@Param("dentistId") Long dentistId);
+	
+//	 e.id,e.dayOfWeek,e.start,e.end,e.dentistProfile,e.deleteAt,e.scheduleTime
 }
