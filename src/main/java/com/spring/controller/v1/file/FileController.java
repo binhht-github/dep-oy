@@ -23,36 +23,36 @@ public class FileController {
         this.fileStorageService = fileStorageService;
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile image) throws IOException {
-
-        System.out.println(image.getOriginalFilename());
-        String filename = null;
-        if (!image.isEmpty()) {
-            String uuid = UUID.randomUUID().toString();
-            String extension = FilenameUtils.getExtension(image.getOriginalFilename());
-            filename = uuid + "." + extension;
-            this.fileStorageService.handleUploadFile(filename,image);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(filename);
-    }
-
 //    @PostMapping("/upload")
 //    public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile image) throws IOException {
+//
+//        System.out.println(image.getOriginalFilename());
 //        String filename = null;
 //        if (!image.isEmpty()) {
 //            String uuid = UUID.randomUUID().toString();
 //            String extension = FilenameUtils.getExtension(image.getOriginalFilename());
 //            filename = uuid + "." + extension;
-//            this.fileStorageService.save(filename,image);
+//            this.fileStorageService.handleUploadFile(filename,image);
 //        }
 //        return ResponseEntity.status(HttpStatus.OK).body(filename);
 //    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile image) throws IOException {
+        String filename = null;
+        if (!image.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            String extension = FilenameUtils.getExtension(image.getOriginalFilename());
+            filename = uuid + "." + extension;
+            this.fileStorageService.save(filename,image);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(filename);
+    }
 
     // hiển thị ảnh
     @GetMapping(value = "/download/image", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImage(@RequestParam(required = false) String filename) throws IOException {
         System.out.println("file name :" + filename);
-        return this.fileStorageService.handleDownloadFile(filename);
+        return this.fileStorageService.downloadFtpFile(filename);
     }
 }
