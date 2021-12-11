@@ -29,7 +29,7 @@ public class BookingDetailDTO {
     Long serviceId;
 
 //    @NotNull
-    String voucherId;
+    Long voucherId;
 
     @NotNull(message = "Không được để trống giá")
     @DecimalMin(value = "1000", message = "Giá phải > 1000")

@@ -138,5 +138,10 @@ public class ScheduleTimeServiceImpl implements ScheduleTimeService {
 	public int addADuto() {
 		return scheduleTimeRepo.postAuto();
 	}
+	
+	@Override
+	public int cleaerRecycle() {
+		return scheduleTimeRepo.clearRecycle();
+	}
 
 }

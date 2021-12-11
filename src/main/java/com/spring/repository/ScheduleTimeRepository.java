@@ -31,8 +31,11 @@ public interface ScheduleTimeRepository extends JpaRepository<ScheduleTime, Long
 	@Query("SELECT e.dayOfWeek FROM ScheduleTime e WHERE e.dentistProfile.id=:dentistProfileId AND "
 			+ "e.deleteAt=FALSE AND e.dayOfWeek > CURRENT_DATE GROUP BY e.dayOfWeek")
 	public List<LocalDate> findAllTimeByDentistId2(@Param("dentistProfileId") Long dentistProfileId);
-	
+
 	@Query(value = "select ROWPERROW();", nativeQuery = true)
 	public int postAuto();
+
+	@Query(value = "select CLEAERRECYCLE();", nativeQuery = true)
+	public int clearRecycle();
 
 }

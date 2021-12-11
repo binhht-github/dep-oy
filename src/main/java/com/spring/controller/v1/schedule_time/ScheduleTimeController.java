@@ -51,6 +51,20 @@ public class ScheduleTimeController {
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping("/clearRecycle")
+	public ResponseEntity<Response<Integer>> cleaerRecycle() throws NotFoundException {
+		Response<Integer> response = new Response<>();
+		try {
+			response.setData(scheduleTimeService.cleaerRecycle());
+		} catch (Exception e) {
+			response.setErrors("Clear schedu-time thất bại");
+			e.printStackTrace();
+			throw new NotFoundException("Thêm schedu-time thất bại");
+		}
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 	// findById
 	@GetMapping("/{id}")

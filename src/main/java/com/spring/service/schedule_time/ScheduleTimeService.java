@@ -40,5 +40,7 @@ public interface ScheduleTimeService {
 	public List<ScheduleTimeDTO> readHourByDayAndDentistId(LocalDate dayOfWeek, Long dentistId);
 	
 	public int addADuto();
+	
+	public int cleaerRecycle();
 
 }
