@@ -23,6 +23,9 @@ public interface ScheduleTimeRepository extends JpaRepository<ScheduleTime, Long
 			+ "e.deleteAt=FALSE AND e.dayOfWeek > CURRENT_DATE GROUP BY e.dayOfWeek")
 	public List<ScheduleTime> findAllTimeByDentistId(@Param("dentistProfileId") Long dentistProfileId);
 
+	@Query(value="select * from schedule_time s where s.id = (select bk.schedule_time_id from booking bk where bk.id =7) ",nativeQuery = true)
+	public ScheduleTime test(Long idbooking);
+	
 	@Query("SELECT e FROM ScheduleTime e WHERE e.dayOfWeek=:dayOfWeek  "
 			+ "AND e.dentistProfile.id=:dentistId AND e.deleteAt=FALSE")
 	public List<ScheduleTime> findHourByDayAndDentistId(@Param("dayOfWeek") LocalDate dayOfWeek,

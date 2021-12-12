@@ -15,7 +15,9 @@ import com.spring.dto.model.BookingDTO;
 import com.spring.dto.model.CustomerProfileDTO;
 import com.spring.exception.NotFoundException;
 import com.spring.model.Booking;
+import com.spring.model.ScheduleTime;
 import com.spring.repository.BookingRepository;
+import com.spring.repository.ScheduleTimeRepository;
 import com.spring.service.account.AccountService;
 import com.spring.service.customer.CustomerService;
 import com.spring.service.email.MailServices;
@@ -34,6 +36,11 @@ public class BookingServiceImpl implements BookingService {
 	CustomerService customerService;
 	@Autowired
 	MailServices mailServices;
+	@Autowired
+	ScheduleTimeRepository scheduleTimeRepository;
+	
+	CustomerProfileDTO customer = new CustomerProfileDTO();
+	ScheduleTime s = new ScheduleTime();
 
 	@Override
 	public List<BookingDTO> findAll() {
@@ -59,24 +66,69 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public BookingDTO create(BookingDTO bookingDTO) {
-		Booking entity = bookingDTO.convertDTOToEntity();
-		entity.setBookingDate(new Date());
-		entity.setStatus(0); // 0-dang cho 1-dat lich thanh cong 2-dat lich that bai
-//		bookingDTO.setId(bookingRepository.save(entity).getId());
-		bookingDTO = bookingRepository.save(entity).convertEntityToDTO();
+		bookingDTO.setBookingDate(new Date());
+		bookingDTO.setStatus(0); // 0-dang cho 1-dat lich thanh cong 2-dat lich that bai
+		Booking entity = bookingRepository.save(bookingDTO.convertDTOToEntity());
+		
+		bookingDTO = entity.convertEntityToDTO();
 		String email = null;
+		Booking bookingDTO2 = bookingRepository.findById(bookingDTO.getId()).get();
+		s=scheduleTimeRepository.test(bookingDTO.getId());
 		try {
+			customer = customerService.getById(entity.getCustomerProfile().getId());
 			email = customerService.getById(this.findById(bookingDTO.getId()).getCustomerProfile().getId())
 					.getAccounts().getEmail();
-			System.out.println("email " + customerService
-					.getById(this.findById(bookingDTO.getId()).getCustomerProfile().getId()).getAccounts().getEmail());
 		} catch (NotFoundException e) {
 			e.printStackTrace();
 		}
 
-		mailServices.push(email, "Thư cảm ơn",
-				"<html>" + "<body>" + "Quý khách Yêu cầu đặt lịch phòng khám, Xin vui lòng chờ xác nhận của chúng tôi"
-						+ "</body>" + "</html>");
+//		mailServices.push(email, "NHA KHOA SMAIL DENTAL - THÔNG BÁO",
+//				"<html>" + "<body>" + "Quý khách Yêu cầu đặt lịch khám nha khoa tại phòng khám" + "<br/> Thời gian: "
+//						+ "Từ " + bookingDTO.getScheduleTime().getStart() + " - "
+//						+ bookingDTO.getScheduleTime().getEnd() + " Ngày:"
+//						+ bookingDTO.getScheduleTime().getDayOfWeek()
+//						+ "<br/> Xin vui lòng chờ xác nhận của chúng tôi" + "</body>" + "</html>");
+//						
+		mailServices.push(email, "NHA KHOA SMAIL DENTAL - THÔNG BÁO",
+				"<html xmlns='http://www.w3.org/1999/xhtml'>"
+				+ "	<body style='margin: 0; padding: 0;'>"
+				+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+				+ "	        <td align='center' bgcolor='#70bbd9' >"
+				+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+				+ "	        </td>"
+				+ "	        <tr>"
+				+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+				+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+				+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+				+"                      <tr  width='100%'>Bạn vừa đặt lịch ở phòng khám Smail Dental</tr>"
+				+ "	                    <tr>"
+				+ "	                        <td width='40%'>"
+				+ "                             Thời gian: "+ s.getDayOfWeek()
+				+ "	                        </td>"
+				+ "	                        <td>"
+				+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+				+ "	                        </td>"
+				+ "	                    </tr>"
+				+"          			<tr width='40%'>"
+				+ "							Xin vui lòng chờ xác nhận của cúng tôi"
+				+ "         			</tr>"
+				+ "						<tr width='100%'>"
+				+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+				+ "						</tr>"
+				+ "						<tr width='100%'>"
+				+ "							SĐT: 0365179297"
+				+ "						</tr>"
+				+ "						<tr>"
+				+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+				+ "						</tr>"
+				+ "	                </table>"
+				+ "	            </td>"
+				+ "	        </tr>"
+						
+				+ "	    </table>"
+				+ "	</body>"
+				+ ""
+				+ "	</html>");
 		return bookingDTO;
 	}
 
@@ -85,20 +137,19 @@ public class BookingServiceImpl implements BookingService {
 
 		Optional<Booking> optional = bookingRepository.findById(bookingDTO.getId());
 		if (optional.isPresent()) {
-			String email = bookingRepository.findById(bookingDTO.getId()).get().
-					getCustomerProfile().getAccounts().getEmail();
+			
+			String email = bookingRepository.findById(bookingDTO.getId()).get().getCustomerProfile().getAccounts()
+					.getEmail();
 
-			Booking oldEntity=optional.get();
-			String dayOfWeekOld=oldEntity.getScheduleTime().getDayOfWeek()
+			Booking oldEntity = optional.get();
+			String dayOfWeekOld = oldEntity.getScheduleTime().getDayOfWeek()
 					.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-			String startOld=oldEntity.getScheduleTime().getStart().
-					format(DateTimeFormatter.ofPattern("HH:mm"));
-			String endOld=oldEntity.getScheduleTime().getEnd()
-					.format(DateTimeFormatter.ofPattern("HH:mm"));
+			String startOld = oldEntity.getScheduleTime().getStart().format(DateTimeFormatter.ofPattern("HH:mm"));
+			String endOld = oldEntity.getScheduleTime().getEnd().format(DateTimeFormatter.ofPattern("HH:mm"));
 
-			Boolean check=false;
-			if(bookingDTO.getScheduleTime().getId()!=oldEntity.getScheduleTime().getId()){
-				check=true;
+			Boolean check = false;
+			if (bookingDTO.getScheduleTime().getId() != oldEntity.getScheduleTime().getId()) {
+				check = true;
 //				System.out.printf("okkkkkkk change");
 			}
 
@@ -107,32 +158,126 @@ public class BookingServiceImpl implements BookingService {
 //			System.out.println(bookingDTO.getScheduleTime().getDayOfWeek()+"aaaaaaaaaa");
 
 			// gửi mail khi thay đổi lịch khám
-			if(check==true){
-				mailServices.push(email, "Thay đổi lịch khám", "<html>" + "<body>"
-						+ "Lịch khám của bạn đã thay đồi từ: <br/>"
-						+"Ngày: "+dayOfWeekOld+" "
-						+"khung giờ: "+startOld
-						+"-"+endOld+"<br/>"
-						+" Chuyển sang: <br/>"
-						+"<b>Ngày: "+bookingDTO.getScheduleTime().getDayOfWeek().
-						format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))+" "+
-						"khung giờ: "+bookingDTO.getScheduleTime().getStart().
-						format(DateTimeFormatter.ofPattern("HH:mm"))+
-						"-"+bookingDTO.getScheduleTime().getEnd().
-						format(DateTimeFormatter.ofPattern("HH:mm"))+
-						"</body>" + "</html>");
+			if (check == true) {
+				try {
+					s=scheduleTimeRepository.test(bookingDTO.getId());
+					customer = customerService.getById(bookingDTO.getCustomerProfile().getId());
+				} catch (NotFoundException e) {
+					System.out.println("Lỗi ở update in bookingImpl services");
+					e.printStackTrace();
+				}
+//				mailServices.push(email, "NHA KHOA SMAIL DENTAL - THAY ĐỔI THAY ĐỔI LỊCH KHÁM",
+//						"<html>" + "<body>" + "Lịch khám của bạn đã thay đồi từ: <br/>" + "Ngày: " + dayOfWeekOld + " "
+//								+ "khung giờ: " + startOld + "-" + endOld + "<br/>" + " Chuyển sang: <br/>"
+//								+ "<b>Ngày: "
+//								+ bookingDTO.getScheduleTime().getDayOfWeek()
+//										.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+//								+ " " + "khung giờ: "
+//								+ bookingDTO.getScheduleTime().getStart().format(DateTimeFormatter.ofPattern("HH:mm"))
+//								+ "-"
+//								+ bookingDTO.getScheduleTime().getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+//								+ "</body>" + "</html>");
+				mailServices.push(email, "NHA KHOA SMAIL DENTAL - THAY ĐỔI LỊCH KHÁM",
+								"<html xmlns='http://www.w3.org/1999/xhtml'>"
+								+ "	<body style='margin: 0; padding: 0;'>"
+								+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+								+ "	        <td align='center' bgcolor='#70bbd9' >"
+								+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+								+ "	        </td>"
+								+ "	        <tr>"
+								+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+								+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+								+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+								+"                      <tr  width='100%'><td colspan='2'>Bạn vừa thay đổi lịch khám</td></tr>"
+								+ "	                    <tr>"
+								+ "	                        <td width='40%'>"
+								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "	                        </td>"
+								+ "	                        <td>"
+								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                        </td>"
+								+ "	                    </tr>"
+								+"          			<tr width='40%'>"
+								+ "							Xin vui lòng chờ xác nhận của cúng tôi"
+								+ "         			</tr>"
+								+ "						<tr width='100%'>"
+								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+								+ "						</tr>"
+								+ "						<tr width='100%'>"
+								+ "							SĐT: 0365179297"
+								+ "						</tr>"
+								+ "						<tr>"
+								+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+								+ "						</tr>"
+								+ "	                </table>"
+								+ "	            </td>"
+								+ "	        </tr>"
+										
+								+ "	    </table>"
+								+ "	</body>"
+								+ ""
+								+ "	</html>");
 //				check=false;
 			}
 
-			//gửi mail khi có kết quả khám
-			if(bookingDTO.getKetqua()!=null && ! bookingDTO.getKetqua().equals("")){
-				mailServices.push(email, "Kết quả khám", "<html>" + "<body>"
-						+ "Kết quả khám của bạn là: <br/>" +
-						bookingDTO.getKetqua()+"<br/>"
-						+"Nha sĩ kết luận: "+bookingDTO.getDentistProfile().getFullName()+
-						"</body>" + "</html>");
+			// gửi mail khi có kết quả khám
+			if (bookingDTO.getKetqua() != null && !bookingDTO.getKetqua().equals("")) {
+				try {
+					s=scheduleTimeRepository.test(bookingDTO.getId());
+					customer = customerService.getById(bookingDTO.getCustomerProfile().getId());
+				} catch (NotFoundException e) {
+					System.out.println("Lỗi ở update in bookingImpl services");
+					e.printStackTrace();
+				}
+//				mailServices.push(email, "NHA KHOA SMAIL DENTAL - KÊT QUẢ",
+//						"<html>" + "<body>" + "Kết quả khám của bạn là: <br/>" + bookingDTO.getKetqua() + "<br/>"
+//								+ "Nha sĩ kết luận: " + bookingDTO.getDentistProfile().getFullName() + "</body>"
+//								+ "</html>");
+				mailServices.push(email, "NHA KHOA SMAIL DENTAL - KÊT QUẢ",
+						"<html xmlns='http://www.w3.org/1999/xhtml'>"
+								+ "	<body style='margin: 0; padding: 0;'>"
+								+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+								+ "	        <td align='center' bgcolor='#70bbd9' >"
+								+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+								+ "	        </td>"
+								+ "	        <tr>"
+								+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+								+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+								+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+								+"                      <tr  width='100%'><td colspan='2'>Kết quả khám của bạn tại SMAIL DENTAIL</td></tr>"
+								+ "	                    <tr>"
+								+ "	                        <td width='40%'>"
+								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "	                        </td>"
+								+ "	                        <td>"
+								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                        </td>"
+								+ "	                    </tr>"
+								+"          			<tr width='40%'>"
+								+ "							Kết luận của bác sĩ: "+ bookingDTO.getKetqua()
+								+ "         			</tr>"
+								+"          			<tr width='40%'>"
+								+ "							<td width='40%'>Kết luận của nha sĩ: "+ bookingDTO.getKetqua()+"</td>"
+								+ "							<td width='60%'>Nha sĩ: "+ bookingDTO.getDentistProfile().getFullName()+"</td>"
+								+ "         			</tr>"
+								+ "						<tr width='100%'>"
+								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+								+ "						</tr>"
+								+ "						<tr width='100%'>"
+								+ "							SĐT: 0365179297"
+								+ "						</tr>"
+								+ "						<tr>"
+								+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+								+ "						</tr>"
+								+ "	                </table>"
+								+ "	            </td>"
+								+ "	        </tr>"
+										
+								+ "	    </table>"
+								+ "	</body>"
+								+ ""
+								+ "	</html>");
 			}
-
 
 		}
 		return bookingDTO;
@@ -183,43 +328,227 @@ public class BookingServiceImpl implements BookingService {
 			bookingRepository.save(entity);
 			dto = entity.convertEntityToDTO();
 			String email = bookingRepository.findById(id).get().getCustomerProfile().getAccounts().getEmail();
-			if(dto.getKetqua() == null) {
+			if (dto.getKetqua() == null) {
 				dto.setKetqua("");
 			}
-			if(dto.getGhichu() == null) {
+			if (dto.getGhichu() == null) {
 				dto.setGhichu("");
 			}
 			switch (status) {
-				case 1:
-					mailServices.push(email, "Phòng Khám Răng", "<html>" + "<body> <b>Thư cảm ơn</b> <br/>"
-							+ "Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi <br/> Quý khách đã đặt lịch khám vào ngày : "
-							+  new SimpleDateFormat("dd-MM-yyyy").format(dto.getBookingDate())
-							+"<br/>Khung giờ khám: "+dto.getScheduleTime().getStart()
-							.format(DateTimeFormatter.ofPattern("HH:mm")) +" - "
-							+ dto.getScheduleTime().getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
-							+ "<br/> Quý khách nhớ đến khám đúng giờ</body>" + "</html>");
-					voucherServiceImpl.sentVoucher(
-							Integer.parseInt(
-									bookingRepository.findById(id).get().getCustomerProfile().getId() + ""),
-							email);
-					break;
-				case 2:
-					mailServices.push(email, "Thư cảm ơn", "<html>" + "<body>"
-							+ "Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi, <br/>" +
-							"kết quả khám sẽ được cập nhật và thông báo đến bạn sớm nhất !"+
-							"</body>" + "</html>");
-	//						voucherServiceImpl.sentVoucher(Integer.parseInt(accountsDTO.getId() + ""), accountsDTO.getEmail());
-					break;
-				case 3:
-					mailServices.push(email, "Thông báo",
-							"<html>" + "<body>" + "Lịch khám của quý khách vừa bị hủy <br/> Lí do hủy: "+dto.getGhichu() + "</body>" + "</html>");
-					break;
-				default:
-					mailServices.push(email, "Thư cảm ơn",
-							"<html>" + "<body>"
-									+ "Quý khách Yêu cầu đặt lịch phòng khám, Xin vui lòng chờ xác nhận của chúng tôi"
-									+ "</body>" + "</html>");
-					break;
+			case 1:
+//				mailServices.push(email, "NHA KHOA SMAIL DENTAL - THÔNG BÁO", "<html>" + "<body> <h2>Xác nhận đặt lịch</h2> <br/>"
+//						+ "Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi <br/> Quý khách đã đặt lịch khám vào ngày : "
+//						+ new SimpleDateFormat("dd-MM-yyyy").format(dto.getBookingDate()) + "<br/>Khung giờ khám: "
+//						+ dto.getScheduleTime().getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - "
+//						+ dto.getScheduleTime().getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+//						+ "<br/> Quý khách nhớ đến khám đúng giờ</body>" + "</html>");
+//				voucherServiceImpl.sentVoucher(
+//						Integer.parseInt(bookingRepository.findById(id).get().getCustomerProfile().getId() + ""),
+//						email);
+				try {
+					s=scheduleTimeRepository.test(dto.getId());
+					customer = customerService.getById(dto.getCustomerProfile().getId());
+				} catch (NotFoundException e) {
+					System.out.println("Lỗi ở update in bookingImpl services");
+					e.printStackTrace();
+				}
+				mailServices.push(email, "NHA KHOA SMAIL DENTAL - XÁC NHẬN LỊCH KHÁM",
+								"<html xmlns='http://www.w3.org/1999/xhtml'>"
+								+ "	<body style='margin: 0; padding: 0;'>"
+								+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+								+ "	        <td align='center' bgcolor='#70bbd9' >"
+								+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+								+ "	        </td>"
+								+ "	        <tr>"
+								+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+								+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+								+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+								+"                      <tr  width='100%'><td colspan='2'>Chúng tôi đã xác nhận lịch khám của bạn</td></tr>"
+								+ "	                    <tr>"
+								+ "	                        <td width='40%'>"
+								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "	                        </td>"
+								+ "	                        <td>"
+								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                        </td>"
+								+ "	                    </tr>"
+								+"          			<tr width='40%'>"
+								+ "							Quý khách nhớ đến khám đúng giờ"
+								+ "         			</tr>"
+								+ "						<tr width='100%'>"
+								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+								+ "						</tr>"
+								+ "						<tr width='100%'>"
+								+ "							SĐT: 0365179297"
+								+ "						</tr>"
+								+ "						<tr>"
+								+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+								+ "						</tr>"
+								+ "	                </table>"
+								+ "	            </td>"
+								+ "	        </tr>"
+										
+								+ "	    </table>"
+								+ "	</body>"
+								+ ""
+								+ "	</html>");
+				break;
+			case 2:
+//				mailServices.push(email, "NHA KHOA SMAIL DENTAL - THƯ CẢM ƠN",
+//						"<html>" + "<body>" + "Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi, <br/>"
+//								+ "kết quả khám sẽ được cập nhật và thông báo đến bạn sớm nhất !" + "</body>"
+//								+ "</html>");
+				try {
+					s=scheduleTimeRepository.test(dto.getId());
+					customer = customerService.getById(dto.getCustomerProfile().getId());
+				} catch (NotFoundException e) {
+					System.out.println("Lỗi ở update in bookingImpl services");
+					e.printStackTrace();
+				}
+				mailServices.push(email, "NHA KHOA SMAIL DENTAL - THƯ CẢM ƠN",
+								"<html xmlns='http://www.w3.org/1999/xhtml'>"
+								+ "	<body style='margin: 0; padding: 0;'>"
+								+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+								+ "	        <td align='center' bgcolor='#70bbd9' >"
+								+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+								+ "	        </td>"
+								+ "	        <tr>"
+								+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+								+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+								+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+								+"                      <tr  width='100%'><td colspan='2'>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi</td></tr>"
+								+ "	                    <tr>"
+								+ "	                        <td width='40%'>"
+								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "	                        </td>"
+								+ "	                        <td>"
+								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                        </td>"
+								+ "	                    </tr>"
+								+"          			<tr width='40%'>"
+								+ "							kết quả khám sẽ được cập nhật và thông báo đến bạn sớm nhất"
+								+ "         			</tr>"
+								+ "						<tr width='100%'>"
+								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+								+ "						</tr>"
+								+ "						<tr width='100%'>"
+								+ "							SĐT: 0365179297"
+								+ "						</tr>"
+								+ "						<tr>"
+								+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+								+ "						</tr>"
+								+ "	                </table>"
+								+ "	            </td>"
+								+ "	        </tr>"
+										
+								+ "	    </table>"
+								+ "	</body>"
+								+ ""
+								+ "	</html>");
+				break;
+			case 3:
+//				mailServices.push(email, "NHA KHOA SMAIL DENTAL - HỦY LỊCH",
+//						"<html>" + "<body>" + "Lịch khám của quý khách vừa bị hủy <br/> Lí do hủy: " + dto.getGhichu()
+//								+ "</body>" + "</html>");
+				
+				try {
+					s=scheduleTimeRepository.test(dto.getId());
+					customer = customerService.getById(dto.getCustomerProfile().getId());
+				} catch (NotFoundException e) {
+					System.out.println("Lỗi ở update in bookingImpl services");
+					e.printStackTrace();
+				}
+				mailServices.push(email, "NHA KHOA SMAIL DENTAL - HỦY LỊCH",
+								"<html xmlns='http://www.w3.org/1999/xhtml'>"
+								+ "	<body style='margin: 0; padding: 0;'>"
+								+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+								+ "	        <td align='center' bgcolor='#70bbd9' >"
+								+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+								+ "	        </td>"
+								+ "	        <tr>"
+								+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+								+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+								+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+								+"                      <tr  width='100%'><td colspan='2'>Lịch khám của quý khách vừa bị hủy</td></tr>"
+								+"                      <tr  width='100%'><td width='20%'>Lý do</td><td width='80%'>"+dto.getGhichu()+"</td></tr>"
+								+ "	                    <tr>"
+								+ "	                        <td width='40%'>"
+								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "	                        </td>"
+								+ "	                        <td>"
+								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                        </td>"
+								+ "	                    </tr>"
+								+"          			<tr width='40%'>"
+								+ "							Nếu quý khách không hài lòng vui lòng đóng góp ý kiến với chúng tôi"
+								+ "         			</tr>"
+								+ "						<tr width='100%'>"
+								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+								+ "						</tr>"
+								+ "						<tr width='100%'>"
+								+ "							SĐT: 0365179297"
+								+ "						</tr>"
+								+ "						<tr>"
+								+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+								+ "						</tr>"
+								+ "	                </table>"
+								+ "	            </td>"
+								+ "	        </tr>"
+										
+								+ "	    </table>"
+								+ "	</body>"
+								+ ""
+								+ "	</html>"); 
+				break;
+			default:
+				try {
+					s=scheduleTimeRepository.test(dto.getId());
+					customer = customerService.getById(dto.getCustomerProfile().getId());
+				} catch (NotFoundException e) {
+					System.out.println("Lỗi ở update in bookingImpl services");
+					e.printStackTrace();
+				}
+				mailServices.push(email, "NHA KHOA SMAIL DENTAL - THÔNG BÁO",
+						"<html xmlns='http://www.w3.org/1999/xhtml'>"
+						+ "	<body style='margin: 0; padding: 0;'>"
+						+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+						+ "	        <td align='center' bgcolor='#70bbd9' >"
+						+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+						+ "	        </td>"
+						+ "	        <tr>"
+						+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+						+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+						+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
+						+"                      <tr  width='100%'>Bạn vừa đặt lịch ở phòng khám Smail Dental</tr>"
+						+ "	                    <tr>"
+						+ "	                        <td width='40%'>"
+						+ "                             Thời gian: "+ s.getDayOfWeek()
+						+ "	                        </td>"
+						+ "	                        <td>"
+						+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+						+ "	                        </td>"
+						+ "	                    </tr>"
+						+"          			<tr width='40%'>"
+						+ "							Xin vui lòng chờ xác nhận của cúng tôi"
+						+ "         			</tr>"
+						+ "						<tr width='100%'>"
+						+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+						+ "						</tr>"
+						+ "						<tr width='100%'>"
+						+ "							SĐT: 0365179297"
+						+ "						</tr>"
+						+ "						<tr>"
+						+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+						+ "						</tr>"
+						+ "	                </table>"
+						+ "	            </td>"
+						+ "	        </tr>"
+								
+						+ "	    </table>"
+						+ "	</body>"
+						+ ""
+						+ "	</html>");
+				break;
 			}
 		}
 		return dto;

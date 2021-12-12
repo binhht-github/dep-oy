@@ -15,8 +15,10 @@ public interface DentistProfileRepository extends JpaRepository<DentistProfile, 
     List<DentistProfile> findAllByDeleteAtIsFalse();
     List<DentistProfile> findAllByDeleteAtIsTrue();
     Optional<DentistProfile> findByAccounts(Accounts accounts);
-    @Query(value = "SELECT * FROM DENTIST_PROFILE dnt "
-            + "ORDER BY(select count(bk.dentist_id) from BOOKING bk where bk.dentist_id = dnt.id) DESC "
+
+
+    @Query(value = "select * from dentist_profile dnt "
+            + "ORDER BY(select count(bk.dentist_id) from booking bk where bk.dentist_id = dnt.id) desc "
             + "LIMIT ?1",nativeQuery = true)
     List<DentistProfile> findAllByTop (int top);
     

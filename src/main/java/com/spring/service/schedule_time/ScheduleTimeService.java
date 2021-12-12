@@ -41,6 +41,6 @@ public interface ScheduleTimeService {
 	
 	public int addADuto();
 	
-	public int cleaerRecycle();
+	public int clearRecycel(); 
 
 }

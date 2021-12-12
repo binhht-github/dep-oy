@@ -140,7 +140,7 @@ public class ScheduleTimeServiceImpl implements ScheduleTimeService {
 	}
 	
 	@Override
-	public int cleaerRecycle() {
+	public int clearRecycel() {
 		return scheduleTimeRepo.clearRecycle();
 	}
 
