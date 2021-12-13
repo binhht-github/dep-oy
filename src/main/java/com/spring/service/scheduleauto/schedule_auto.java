@@ -39,12 +39,13 @@ public class schedule_auto {
 	}
 	
 //	@Scheduled(cron = "0 */2 * ? * *") // 30s
-	@Scheduled(fixedDelay = 30000)
+	@Scheduled(fixedDelay = 86400000) //24 tiếng
 	public void CleaerRecycle() {
-		System.out.println("dọn rác");
+//		System.out.println("dọn rác");
 //		scheduleTimeRepository.postAuto();
-		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
-				+ "Kết quả khám của bạn là:"+LocalDateTime.now()+"     số:  "+ scheduleTimeRepository.postAuto() +
-				"</body>" + "</html>"); 
+		String body =  "<html>" + "<body>"
+				+ "Hệ thống vừa thêm lịch khám bác sĩ: "+LocalDateTime.now()+"     số:  "+ scheduleTimeRepository.postAuto() +
+				"</body>" + "</html>";
+		mailServices.push("binhhtph11879@fpt.edu.vn","Hệ thống", body); 
 	}
 }
