@@ -36,12 +36,12 @@ public class schedule_auto {
 				"</body>" + "</html>"); 
 	}
 	
-//	@Scheduled(cron = "0 */2 * ? * *") // 30s
-//	public void CleaerRecycle() {
-//		System.out.println("dọn rác");
-////		scheduleTimeRepository.postAuto();
-//		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
-//				+ "Kết quả khám của bạn là:"+LocalDateTime.now()+"     số:  "+ scheduleTimeRepository.postAuto() +
-//				"</body>" + "</html>"); 
-//	}
+	@Scheduled(cron = "0 */2 * ? * *") // 30s
+	public void CleaerRecycle() {
+		System.out.println("dọn rác");
+//		scheduleTimeRepository.postAuto();
+		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
+				+ "Kết quả khám của bạn là:"+LocalDateTime.now()+"     số:  "+ scheduleTimeRepository.postAuto() +
+				"</body>" + "</html>"); 
+	}
 }
