@@ -39,7 +39,8 @@ public class schedule_auto {
 	}
 	
 //	@Scheduled(cron = "0 */2 * ? * *") // 30s
-	@Scheduled(fixedDelay = 86400000) //24 tiếng
+//	@Scheduled(fixedDelay = 86400000) //24 tiếng
+	@Scheduled(fixedDelay = 60000) //24 tiếng
 	public void CleaerRecycle() {
 //		System.out.println("dọn rác");
 //		scheduleTimeRepository.postAuto();
