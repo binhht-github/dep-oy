@@ -36,7 +36,8 @@ public class schedule_auto {
 				"</body>" + "</html>"); 
 	}
 	
-	@Scheduled(cron = "0 */2 * ? * *") // 30s
+//	@Scheduled(cron = "0 */2 * ? * *") // 30s
+	@Scheduled(fixedDelay = 30000)
 	public void CleaerRecycle() {
 		System.out.println("dọn rác");
 //		scheduleTimeRepository.postAuto();
