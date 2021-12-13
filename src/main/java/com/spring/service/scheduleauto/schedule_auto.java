@@ -3,6 +3,7 @@ package com.spring.service.scheduleauto;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import com.spring.repository.ScheduleTimeRepository;
 import com.spring.service.email.MailServices;
 
 @EnableScheduling
+@SpringBootApplication
 @Service
 public class schedule_auto {
 	@Autowired
