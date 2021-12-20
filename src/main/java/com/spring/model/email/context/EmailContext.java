@@ -16,8 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class EmailContext {
 
-    String from = "hoanghung2354454@gmail.com";
-//    String from = "smiledentalfpt@gmail.com";
+//    String from = "hoanghung2354454@gmail.com";
+    String from = "smiledentalfpt@gmail.com";
     String to ;
     String subject ;
     String body ;

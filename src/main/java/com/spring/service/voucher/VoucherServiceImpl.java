@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,12 +56,43 @@ public class VoucherServiceImpl implements VoucherService {
 			System.out.println("count id " + voucherRepository.getCountBooking(id));
 			if (voucherRepository.getCountBooking(id) == 20) {
 				String maVoucher = createVoucher(id);
-				v = new VoucherDTO(maVoucher, "CHI ÂN KHÁCH HÀNG JAVA", "ẢNH", 50.0, LocalDateTime.now(),
+				v = new VoucherDTO(maVoucher, "Voucher Khach Hang Than Thiet", "ẢNH", 50.0, LocalDateTime.now(),
 						LocalDateTime.now().plusMonths(2), new Date(), false);
 				if (save(v) != null) {
-					mailServices.push(EmailNhan, "Chi ân khách hàng" + v.getContent(),
-							"<html><body>Xin cảm ơn quý khách đã sử dụng dịch vụ của phòng khám, phòng khám xin gửi tới quý khách 1 voucher giảm giá 50%"
-									+ " <br/> Mã Voucher: " + maVoucher + " </body></html>");
+//					mailServices.push(EmailNhan, "Chi ân khách hàng" + v.getContent(),
+//							"<html><body>Xin cảm ơn quý khách đã sử dụng dịch vụ của phòng khám, phòng khám xin gửi tới quý khách 1 voucher giảm giá 50%"
+//									+ " <br/> Mã Voucher: " + maVoucher + " </body></html>");
+					mailServices.push(EmailNhan, "NHA KHOA SMAIL DENTAL - CHI ÂN KHÁCH HÀNG",
+							"<html xmlns='http://www.w3.org/1999/xhtml'>"
+							+ "	<body style='margin: 0; padding: 0;'>"
+							+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+							+ "	        <td align='center' bgcolor='#70bbd9' >"
+							+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+							+ "	        </td>"
+							+ "	        <tr>"
+							+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+							+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+							+"                      <tr><td>Xin chào "+EmailNhan+"</td></tr>"
+							+"                      <tr  width='100%'><td colspan='2'>Phòng Khám xin gửi tới bạn một voucher giảm giá"+v.getSale()+"%</td></tr>"
+							+"          			<tr width='100%'>"
+							+ "							<td colspan='2'>Xin cảm ơn bạn đã sử dụng dịch vụ của chúng tôi</td>"
+							+ "         			</tr>"
+							+ "						<tr width='100%'>"
+							+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+							+ "						</tr>"
+							+ "						<tr width='100%'>"
+							+ "							SĐT: 0365179297"
+							+ "						</tr>"
+							+ "						<tr>"
+							+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+							+ "						</tr>"
+							+ "	                </table>"
+							+ "	            </td>"
+							+ "	        </tr>"
+							+ "	    </table>"
+							+ "	</body>"
+							+ ""
+							+ "	</html>");
 				}
 			}
 		} catch (Exception e) {
@@ -77,12 +109,43 @@ public class VoucherServiceImpl implements VoucherService {
 		try {
 			CustomerProfileDTO cs = customerService.getById(idCustomer);
 			String maVoucher = createVoucher(Integer.parseInt(idCustomer + ""));
-			VoucherDTO v = new VoucherDTO(maVoucher, "CHI ÂN KHÁCH HÀNG JAVA", "ẢNH", sale, LocalDateTime.now(),
+			VoucherDTO v = new VoucherDTO(maVoucher, "Gui Voucher Khach Hang", "ẢNH", sale, LocalDateTime.now(),
 					LocalDateTime.now().plusMonths(2), new Date(), false);
 			if (save(v) != null) {
-				mailServices.push(cs.getAccounts().getEmail(), "Chi ân khách hàng" + v.getContent(),
-						"<html><body>Xin cảm ơn quý khách đã sử dụng dịch vụ của phòng khám, phòng khám xin gửi tới quý khách 1 voucher giảm giá "+sale+"%"
-								+ " <br/> Mã Voucher: " + maVoucher + " </body></html>");
+//				mailServices.push(cs.getAccounts().getEmail(), "Chi ân khách hàng" + v.getContent(),
+//						"<html><body>Xin cảm ơn quý khách đã sử dụng dịch vụ của phòng khám, phòng khám xin gửi tới quý khách 1 voucher giảm giá "+sale+"%"
+//								+ " <br/> Mã Voucher: " + maVoucher + " </body></html>");
+				mailServices.push(cs.getAccounts().getEmail(), "NHA KHOA SMAIL DENTAL - CHI ÂN KHÁCH HÀNG",
+						"<html xmlns='http://www.w3.org/1999/xhtml'>"
+						+ "	<body style='margin: 0; padding: 0;'>"
+						+ "	    <table align='center' cellpadding='0' cellspacing='0' width='600'>"
+						+ "	        <td align='center' bgcolor='#70bbd9' >"
+						+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
+						+ "	        </td>"
+						+ "	        <tr>"
+						+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
+						+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
+						+"                      <tr><td>Xin chào "+cs.getFullname()+"</td></tr>"
+						+"                      <tr  width='100%'><td colspan='2'>Phòng Khám xin gửi tới bạn một voucher giảm giá"+v.getSale()+"%</td></tr>"
+						+"          			<tr width='100%'>"
+						+ "							<td colspan='2'>Xin cảm ơn bạn đã sử dụng dịch vụ của chúng tôi</td>"
+						+ "         			</tr>"
+						+ "						<tr width='100%'>"
+						+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
+						+ "						</tr>"
+						+ "						<tr width='100%'>"
+						+ "							SĐT: 0365179297"
+						+ "						</tr>"
+						+ "						<tr>"
+						+ "							<td colspan='2'>Địa chỉ: Số 76, ngõ 66 Nguyễn Hoàng, Nam Từ Niêm, Hà Nội </td>"
+						+ "						</tr>"
+						+ "	                </table>"
+						+ "	            </td>"
+						+ "	        </tr>"
+						+ "	    </table>"
+						+ "	</body>"
+						+ ""
+						+ "	</html>");
 			}
 			this.sentVoucher(Integer.parseInt(cs.getAccounts().getId() + ""), cs.getAccounts().getEmail());
 			response.setErrors("Gửi Voucher Thành công");

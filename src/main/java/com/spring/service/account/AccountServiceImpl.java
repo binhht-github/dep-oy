@@ -125,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
         verificationToken.setCreateAt(LocalDateTime.now());
         verificationToken.setType(VerificationEnum.VERIFY_ACCOUNT);
 //        https://www.facebook.com/
-        String subject = "Xác Minh Tài Khoản!";
+        String subject = "NHA KHOA SMAIL DENTAL - XÁC MINH TÀI KHOẢN";
 //        String body = "localhost:8080/api/v1/accounts/verify?token=" + verificationToken.getToken();
         String body = verificationToken.getToken();
 //        this.mailServices.push(account.getEmail(), subject, "<html><body>"
@@ -141,13 +141,13 @@ public class AccountServiceImpl implements AccountService {
 				+ "	            <img src='https://png.pngtree.com/template/20190717/ourlarge/pngtree-dental-logo-template-vector-blue-image_229151.jpg' alt='Creating Email Magic' width='600' height='300' style='display: block;' />"
 				+ "	        </td>"
 				+ "	        <tr>"
-				+ "             <td><h1>Xin chào"+account.getEmail()+"</h1></td>"
+				+ "             <td><h1 >Xin chào "+account.getEmail()+"</h1></td>"
 				+ "	        </tr>"
 				+ "	        <tr>"
 				+ "             <td>Bạn vừa đăng ký tài trên hệ thống phòng khám Smail Dental</td>"
 				+ "	        </tr>"
 				+ "	        <tr>"
-				+ "             <td>Bấm <a href='http://localhost:8080/api/v1/accounts/verify?token=\"+body+\"'>vào đây</a> Để kích hoạt tài khoản</td>"
+				+ "             <td >Bấm <b><a style='text-decoration:none' href='http://localhost:8080/api/v1/accounts/verify?token="+body+"'>vào đây</a></b> để kích hoạt tài khoản</td>"
 				+ "	        </tr>"
 				+ "	    </table>"
 				+ "	</body>"

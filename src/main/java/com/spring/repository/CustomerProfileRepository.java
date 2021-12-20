@@ -22,6 +22,12 @@ public interface CustomerProfileRepository extends JpaRepository<CustomerProfile
     @Query(value = "select * from CountCustomer", nativeQuery = true)
     List<Map<String, Integer>> report();
     
+    @Query(value = "select * from thongkekhachangdakham",nativeQuery = true)
+    List<Object[]> list();
+    
+    @Query(value = "select * from thongkekhachhangdatlich",nativeQuery = true)
+    List<Object[]> list2();
+    
 //    @Query(value = "select \n"
 //    		+ "(select count(bk.customer_id) from booking bk where bk.customer_id = ctpf.id) as solandat\n"
 //    		+ "from customer_profile ctpf;", nativeQuery = true)

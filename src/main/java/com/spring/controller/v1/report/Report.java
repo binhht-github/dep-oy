@@ -13,15 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.dto.model.ReportBookingDTO;
 import com.spring.dto.model.ReportCustommer;
 import com.spring.dto.model.ReportDentist;
+import com.spring.dto.model.ReportSoBenhNhanKham;
 import com.spring.dto.model.ReportThangDTO;
 import com.spring.dto.model.ReportThongKeDTO;
+import com.spring.dto.model.thongkekhachhangdadatlich;
+import com.spring.dto.model.thongkekhachhangdakham;
 import com.spring.dto.response.Response;
 import com.spring.service.reportBooking.ReportBooking;
 import com.spring.service.reportCustomer.ReportCustomerService;
 import com.spring.service.reportDentist.ReportDentistService;
+import com.spring.service.reportNhaSivsBenhNhan.ReportTopBacSi;
 import com.spring.service.reportServices.ReportServices;
 import com.spring.service.reportThang.reportThang;
 import com.spring.service.reportThongke.ReportThongKe;
+import com.spring.service.thongkekhachhangdakham.tkkhdkServices;
 
 @RestController
 @RequestMapping("/api/v1/report")
@@ -38,6 +43,10 @@ public class Report {
 	ReportThongKe reportThongKe;
 	@Autowired
 	reportThang reportThangservices;
+	@Autowired
+	tkkhdkServices tkServices;
+	@Autowired
+	ReportTopBacSi r;
 	
 	// trả về danh sách bác sĩ và số người đặt bắc sĩ
 	@GetMapping("/dentist")
@@ -81,4 +90,26 @@ public class Report {
 		response.setData(reportThangservices.report(nam));
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	// STRAT     Khải
+	@GetMapping("/dakham")
+	public ResponseEntity<Response<List<thongkekhachhangdakham>>> ThongKeDaKham() {
+		Response<List<thongkekhachhangdakham>> response = new Response<>();
+		response.setData(tkServices.ThongKeDaKham());
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/dadatlich")
+	public ResponseEntity<Response<List<thongkekhachhangdadatlich>>> ThongKeDaDatLich() {
+		Response<List<thongkekhachhangdadatlich>> response = new Response<>();
+		response.setData(tkServices.ThongKeDaDatLich());
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/topbacsi")
+	public ResponseEntity<Response<List<ReportSoBenhNhanKham>>> topbacsi() {
+		Response<List<ReportSoBenhNhanKham>> response = new Response<>();
+		response.setData(r.list());
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	// END  Khải
 }

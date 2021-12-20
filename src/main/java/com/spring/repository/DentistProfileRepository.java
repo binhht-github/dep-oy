@@ -1,14 +1,15 @@
 package com.spring.repository;
 
-import com.spring.model.Accounts;
-import com.spring.model.DentistProfile;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.spring.model.Accounts;
+import com.spring.model.DentistProfile;
 
 @Repository
 public interface DentistProfileRepository extends JpaRepository<DentistProfile, Long> {
@@ -26,5 +27,8 @@ public interface DentistProfileRepository extends JpaRepository<DentistProfile, 
     
     @Query(value = "select * from reportAllDentist", nativeQuery = true)
     List<Map<String, Integer>> report();
+    
+    @Query(value="select * from sobenhnhankham",nativeQuery = true)
+    List<Object[]> list();
     
 }

@@ -23,6 +23,7 @@ public class FileController {
         this.fileStorageService = fileStorageService;
     }
 
+    //ảnh trên local
 //    @PostMapping("/upload")
 //    public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile image) throws IOException {
 //
@@ -37,6 +38,7 @@ public class FileController {
 //        return ResponseEntity.status(HttpStatus.OK).body(filename);
 //    }
 
+//    ảnh trên server
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile image) throws IOException {
         String filename = null;
@@ -53,7 +55,7 @@ public class FileController {
     @GetMapping(value = "/download/image", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImage(@RequestParam(required = false) String filename) throws IOException {
         System.out.println("file name :" + filename);
-//           return this.fileStorageService.handleDownloadFile(filename);
+//        return this.fileStorageService.handleDownloadFile(filename);
         return this.fileStorageService.downloadFtpFile(filename);
     }
 }

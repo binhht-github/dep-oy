@@ -22,28 +22,29 @@ public class schedule_auto {
 	
 	@Scheduled(cron = "0 0 1 * * ?") // hàng ngày lúc 1h sáng
 	public void addScheduleTime() {
-//		scheduleTimeRepository.postAuto();
-//		scheduleTimeRepository.clearRecycle();
-		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
-				+ "Hệ thống vừa thêm lịch khám ngày: "+scheduleTimeRepository.postAuto()+" lúc "+ LocalDateTime.now()+
-				"dọc rác thành công " + scheduleTimeRepository.clearRecycle()+
-				"</body>" + "</html>"); 
+		scheduleTimeRepository.postAuto7Day();
+		scheduleTimeRepository.clearRecycle();
+//		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
+//				+ "Hệ thống vừa thêm lịch khám ngày: "+scheduleTimeRepository.postAuto()+" lúc "+ LocalDateTime.now()+
+//				"dọc rác thành công " + scheduleTimeRepository.clearRecycle()+
+//				"</body>" + "</html>"); 
 	}
 	
 	@Scheduled(cron = "0 0 12 * * ?") // hàng ngày lúc 12h đêm
 	public void addScheduleTime2() {
-		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
-				+ "Hệ thống vừa thêm lịch khám ngày: "+scheduleTimeRepository.postAuto()+" lúc "+ LocalDateTime.now()+
-				"dọc rác thành công " + scheduleTimeRepository.clearRecycle()+
-				"</body>" + "</html>"); 
+		scheduleTimeRepository.clearRecycle();
+		scheduleTimeRepository.postAuto();
+//		mailServices.push("binhhtph11879@fpt.edu.vn", "abc", "<html>" + "<body>"
+//				+ "Hệ thống vừa thêm lịch khám ngày: "+scheduleTimeRepository.postAuto()+" lúc "+ LocalDateTime.now()+
+//				"dọc rác thành công " + scheduleTimeRepository.clearRecycle()+
+//				"</body>" + "</html>"); 
 	}
 	
 //	@Scheduled(cron = "0 */2 * ? * *") // 30s
 	@Scheduled(fixedDelay = 86400000) //24 tiếng
-//	@Scheduled(fixedDelay = 60000) //1 phút
 	public void CleaerRecycle() {
-//		System.out.println("dọn rác");
-//		scheduleTimeRepository.postAuto();
+		scheduleTimeRepository.clearRecycle();
+		scheduleTimeRepository.postAuto7Day();
 		String body =  "<html>" + "<body>"
 				+ "Hệ thống vừa thêm lịch khám bác sĩ: "+LocalDateTime.now()+"     số:  "+ scheduleTimeRepository.postAuto() +
 				"</body>" + "</html>";

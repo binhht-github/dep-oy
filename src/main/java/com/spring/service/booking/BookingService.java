@@ -16,6 +16,8 @@ public interface BookingService {
 
     BookingDTO update(BookingDTO bookingDTO);
 
+    BookingDTO updateGhiChu(BookingDTO bookingDTO);
+
     BookingDTO findByScheduleTime(Long id);
 
     List<BookingDTO> findByCustomerId(Long id);

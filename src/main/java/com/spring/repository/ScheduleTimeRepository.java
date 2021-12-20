@@ -23,7 +23,7 @@ public interface ScheduleTimeRepository extends JpaRepository<ScheduleTime, Long
 			+ "e.deleteAt=FALSE AND e.dayOfWeek > CURRENT_DATE GROUP BY e.dayOfWeek")
 	public List<ScheduleTime> findAllTimeByDentistId(@Param("dentistProfileId") Long dentistProfileId);
 
-	@Query(value="select * from schedule_time s where s.id = (select bk.schedule_time_id from booking bk where bk.id =7) ",nativeQuery = true)
+	@Query(value="select * from schedule_time s where s.id = (select bk.schedule_time_id from booking bk where bk.id =?1) ",nativeQuery = true)
 	public ScheduleTime test(Long idbooking);
 	
 	@Query("SELECT e FROM ScheduleTime e WHERE e.dayOfWeek=:dayOfWeek  "
@@ -37,6 +37,9 @@ public interface ScheduleTimeRepository extends JpaRepository<ScheduleTime, Long
 
 	@Query(value = "select ROWPERROW();", nativeQuery = true)
 	public int postAuto();
+	
+	@Query(value = "select DAMBAO7NGAYTRONG();", nativeQuery = true)
+	public int postAuto7Day();
 
 	@Query(value = "select CLEAERRECYCLE();", nativeQuery = true)
 	public int clearRecycle();

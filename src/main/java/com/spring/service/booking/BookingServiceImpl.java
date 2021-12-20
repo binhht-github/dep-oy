@@ -100,17 +100,17 @@ public class BookingServiceImpl implements BookingService {
 				+ "	            <td bgcolor='#ffffff' style='padding: 40px 30px 40px 30px;'>"
 				+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
 				+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
-				+"                      <tr  width='100%'>Bạn vừa đặt lịch ở phòng khám Smail Dental</tr>"
+				+"                      <tr  width='100%'><td colspan='2'>Bạn vừa đặt lịch ở phòng khám Smail Dental</td></tr>"
 				+ "	                    <tr>"
 				+ "	                        <td width='40%'>"
-				+ "                             Thời gian: "+ s.getDayOfWeek()
+				+ "                             Thời gian: "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 				+ "	                        </td>"
 				+ "	                        <td>"
 				+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 				+ "	                        </td>"
 				+ "	                    </tr>"
-				+"          			<tr width='40%'>"
-				+ "							Xin vui lòng chờ xác nhận của cúng tôi"
+				+"          			<tr width='100%'>"
+				+ "							<td colspan='2'>Xin vui lòng chờ xác nhận của chúng tôi</td>"
 				+ "         			</tr>"
 				+ "						<tr width='100%'>"
 				+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
@@ -191,15 +191,12 @@ public class BookingServiceImpl implements BookingService {
 								+"                      <tr  width='100%'><td colspan='2'>Bạn vừa thay đổi lịch khám</td></tr>"
 								+ "	                    <tr>"
 								+ "	                        <td width='40%'>"
-								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "                             Thời gian: "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 								+ "	                        </td>"
 								+ "	                        <td>"
 								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 								+ "	                        </td>"
 								+ "	                    </tr>"
-								+"          			<tr width='40%'>"
-								+ "							Xin vui lòng chờ xác nhận của cúng tôi"
-								+ "         			</tr>"
 								+ "						<tr width='100%'>"
 								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
 								+ "						</tr>"
@@ -220,6 +217,23 @@ public class BookingServiceImpl implements BookingService {
 //				check=false;
 			}
 
+
+		}
+		return bookingDTO;
+	}
+
+	@Override
+	public BookingDTO updateGhiChu(BookingDTO bookingDTO) {
+		Optional<Booking> optional = bookingRepository.findById(bookingDTO.getId());
+		if (optional.isPresent()) {
+
+			String email = bookingRepository.findById(bookingDTO.getId())
+					.get().getCustomerProfile().getAccounts()
+					.getEmail();
+
+			Booking entity = bookingDTO.convertDTOToEntity();
+			bookingDTO = bookingRepository.save(entity).convertEntityToDTO();
+
 			// gửi mail khi có kết quả khám
 			if (bookingDTO.getKetqua() != null && !bookingDTO.getKetqua().equals("")) {
 				try {
@@ -229,10 +243,7 @@ public class BookingServiceImpl implements BookingService {
 					System.out.println("Lỗi ở update in bookingImpl services");
 					e.printStackTrace();
 				}
-//				mailServices.push(email, "NHA KHOA SMAIL DENTAL - KÊT QUẢ",
-//						"<html>" + "<body>" + "Kết quả khám của bạn là: <br/>" + bookingDTO.getKetqua() + "<br/>"
-//								+ "Nha sĩ kết luận: " + bookingDTO.getDentistProfile().getFullName() + "</body>"
-//								+ "</html>");
+
 				mailServices.push(email, "NHA KHOA SMAIL DENTAL - KÊT QUẢ",
 						"<html xmlns='http://www.w3.org/1999/xhtml'>"
 								+ "	<body style='margin: 0; padding: 0;'>"
@@ -247,15 +258,12 @@ public class BookingServiceImpl implements BookingService {
 								+"                      <tr  width='100%'><td colspan='2'>Kết quả khám của bạn tại SMAIL DENTAIL</td></tr>"
 								+ "	                    <tr>"
 								+ "	                        <td width='40%'>"
-								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "                             Thời gian: "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 								+ "	                        </td>"
 								+ "	                        <td>"
 								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 								+ "	                        </td>"
 								+ "	                    </tr>"
-								+"          			<tr width='40%'>"
-								+ "							Kết luận của bác sĩ: "+ bookingDTO.getKetqua()
-								+ "         			</tr>"
 								+"          			<tr width='40%'>"
 								+ "							<td width='40%'>Kết luận của nha sĩ: "+ bookingDTO.getKetqua()+"</td>"
 								+ "							<td width='60%'>Nha sĩ: "+ bookingDTO.getDentistProfile().getFullName()+"</td>"
@@ -272,7 +280,7 @@ public class BookingServiceImpl implements BookingService {
 								+ "	                </table>"
 								+ "	            </td>"
 								+ "	        </tr>"
-										
+
 								+ "	    </table>"
 								+ "	</body>"
 								+ ""
@@ -366,14 +374,14 @@ public class BookingServiceImpl implements BookingService {
 								+"                      <tr  width='100%'><td colspan='2'>Chúng tôi đã xác nhận lịch khám của bạn</td></tr>"
 								+ "	                    <tr>"
 								+ "	                        <td width='40%'>"
-								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "                             Thời gian:  "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 								+ "	                        </td>"
 								+ "	                        <td>"
-								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                            Khung giờ:  "+ "Từ:  " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 								+ "	                        </td>"
 								+ "	                    </tr>"
-								+"          			<tr width='40%'>"
-								+ "							Quý khách nhớ đến khám đúng giờ"
+								+"          			<tr width='100%'>"
+								+ "							<td colspan='2'>Quý khách nhớ đến khám đúng giờ</td>"
 								+ "         			</tr>"
 								+ "						<tr width='100%'>"
 								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
@@ -419,14 +427,14 @@ public class BookingServiceImpl implements BookingService {
 								+"                      <tr  width='100%'><td colspan='2'>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi</td></tr>"
 								+ "	                    <tr>"
 								+ "	                        <td width='40%'>"
-								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "                             Thời gian:  "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 								+ "	                        </td>"
 								+ "	                        <td>"
-								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                            Khung giờ:  "+ "Từ:  " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 								+ "	                        </td>"
 								+ "	                    </tr>"
-								+"          			<tr width='40%'>"
-								+ "							kết quả khám sẽ được cập nhật và thông báo đến bạn sớm nhất"
+								+"          			<tr width='100%'>"
+								+ "							<td colspan='2'>Kết quả khám sẽ được cập nhật và thông báo đến bạn sớm nhất</td>"
 								+ "         			</tr>"
 								+ "						<tr width='100%'>"
 								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
@@ -470,17 +478,17 @@ public class BookingServiceImpl implements BookingService {
 								+ "	                <table cellpadding='0' cellspacing='0' width='100%'>"
 								+"                      <tr><td>Xin chào "+customer.getFullname()+"</td></tr>"
 								+"                      <tr  width='100%'><td colspan='2'>Lịch khám của quý khách vừa bị hủy</td></tr>"
-								+"                      <tr  width='100%'><td width='20%'>Lý do</td><td width='80%'>"+dto.getGhichu()+"</td></tr>"
+								+"                      <tr  width='100%'><td colspan='2'>Lý do: " +dto.getGhichu()+"</td></tr>"
 								+ "	                    <tr>"
 								+ "	                        <td width='40%'>"
-								+ "                             Thời gian: "+ s.getDayOfWeek()
+								+ "                             Thời gian: "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 								+ "	                        </td>"
 								+ "	                        <td>"
-								+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+								+ "	                            Khung giờ:  "+ "Từ:  " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 								+ "	                        </td>"
 								+ "	                    </tr>"
-								+"          			<tr width='40%'>"
-								+ "							Nếu quý khách không hài lòng vui lòng đóng góp ý kiến với chúng tôi"
+								+"          			<tr width='100%'>"
+								+ "							<td colspan='2'>Nếu quý khách không hài lòng vui lòng đóng góp ý kiến với chúng tôi</td>"
 								+ "         			</tr>"
 								+ "						<tr width='100%'>"
 								+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"
@@ -522,14 +530,14 @@ public class BookingServiceImpl implements BookingService {
 						+"                      <tr  width='100%'>Bạn vừa đặt lịch ở phòng khám Smail Dental</tr>"
 						+ "	                    <tr>"
 						+ "	                        <td width='40%'>"
-						+ "                             Thời gian: "+ s.getDayOfWeek()
+						+ "                             Thời gian: "+ s.getDayOfWeek().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 						+ "	                        </td>"
 						+ "	                        <td>"
-						+ "	                            Khung giờ: "+ "Từ " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
+						+ "	                            Khung giờ: "+ "Từ: " + s.getStart().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + s.getEnd().format(DateTimeFormatter.ofPattern("HH:mm"))
 						+ "	                        </td>"
 						+ "	                    </tr>"
 						+"          			<tr width='40%'>"
-						+ "							Xin vui lòng chờ xác nhận của cúng tôi"
+						+ "							<td colspan='2'>Xin vui lòng chờ xác nhận của cúng tôi</td>"
 						+ "         			</tr>"
 						+ "						<tr width='100%'>"
 						+ "							<td colspan='2'>SMAIL DENTAL NÂNG NIU HÀM RĂNG VIỆT</td>"

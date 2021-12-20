@@ -13,13 +13,16 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    @Query("select bk from Booking bk where bk.scheduleTime.id=?1")
+	@Query("select bk from Booking bk order by bk.id desc")
+    List<Booking> findAll();
+	
+	@Query("select bk from Booking bk where bk.scheduleTime.id=?1")
     Optional<Booking> findByScheduleTimeId(Long id);
 
-    @Query("select bk from Booking bk where bk.customerProfile.id=?1")
+    @Query("select bk from Booking bk where bk.customerProfile.id=?1 order by bk.id desc")
     List<Booking> findByCustomerId(Long id);
 
-    @Query("select bk from Booking bk where bk.dentistProfile.id=?1")
+    @Query("select bk from Booking bk where bk.dentistProfile.id=?1 order by bk.id desc")
     List<Booking> findByDentistId(Long id);
     //check trùng lịch
     //<> not equals, <> tương đương với !=

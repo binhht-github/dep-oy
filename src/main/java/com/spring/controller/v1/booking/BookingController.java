@@ -99,7 +99,7 @@ public class BookingController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		response.setData(this.bookingService.update(bookingDTO));
+		response.setData(this.bookingService.updateGhiChu(bookingDTO));
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
